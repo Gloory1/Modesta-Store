@@ -1,5 +1,5 @@
 from pywebio import start_server, config
-from pywebio.output import put_html, put_buttons, put_row, put_markdown, clear, use_scope, popup, toast, put_table, close_popup, put_column, put_image, put_text, put_grid
+from pywebio.output import put_html, put_buttons, put_row, put_markdown, clear, use_scope, popup, toast, put_table, close_popup, put_column, put_image, put_text, put_grid, put_scope
 from pywebio.input import input_group, input, select, textarea, NUMBER
 from pywebio.pin import put_input, pin
 from pywebio.session import run_js, set_env
@@ -380,10 +380,6 @@ class UI:
             # We will generate a column for each product inside this row
         ], wrap=True, size='300px').style('justify-content: center; gap: 30px; padding: 20px; max-width: 1300px; margin: 0 auto;')
         
-        # We need to use a container that allows widgets. put_grid is okay, but put_row with wrap is better for responsive cards.
-        # Since put_row doesn't support appending easily in a loop if not defined at once, 
-        # we will construct the list of widgets first.
-        
         cards = []
         
         for p in products:
@@ -411,10 +407,11 @@ class UI:
             qty_pin_name = f"qty_{p.id}"
             
             # Card Action Row (Input + Button)
+            # FIXED: Lambda now accepts `_` as the first argument (button value) to prevent overwriting `p`
             action_row = put_row([
                 pin.put_input(qty_pin_name, type='number', value=1).style('width: 70px; margin-right: 10px;'),
                 put_buttons([{'label': 'Add', 'value': 'add'}], 
-                            onclick=[lambda p=p, name=qty_pin_name: on_add_to_cart(p, pin[name])])
+                            onclick=[lambda _, p=p, name=qty_pin_name: on_add_to_cart(p, pin[name])])
             ], size='auto').style('justify-content: center; padding-bottom: 25px;')
             
             # Combine into a column
